@@ -10,14 +10,13 @@
 
 Summary: Free reimplementation of the OpenDivX video codec
 Name: xvidcore
-Version: 1.2.2
+Version: 1.3.4
 Release: 1%{?dist}
 License: XviD
 Group: System Environment/Libraries
 URL: http://www.xvid.org/
 
 Source: http://downloads.xvid.org/downloads/xvidcore-%{version}.tar.bz2
-Patch0: xvidcore-1.1.0-verbose-build.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: yasm
@@ -47,7 +46,6 @@ needed to build applications that will use the XviD video codec.
 
 %prep
 %setup -n %{name}
-%patch0 -p1 -b .verbose-build
 
 %build
 cd build/generic/
@@ -61,9 +59,9 @@ cd build/generic/
 %{__make} install DESTDIR="%{buildroot}"
 cd -
 ### Make .so and .so.x symlinks to the so.x.y file, +x to get proper stripping
-%{__ln_s} -f libxvidcore.so.4.2 %{buildroot}%{_libdir}/libxvidcore.so.4
-%{__ln_s} -f libxvidcore.so.4.2 %{buildroot}%{_libdir}/libxvidcore.so
-%{__chmod} +x %{buildroot}%{_libdir}/libxvidcore.so.4.2
+%{__ln_s} -f libxvidcore.so.4.3 %{buildroot}%{_libdir}/libxvidcore.so.4
+%{__ln_s} -f libxvidcore.so.4.3 %{buildroot}%{_libdir}/libxvidcore.so
+%{__chmod} +x %{buildroot}%{_libdir}/libxvidcore.so.4.3
 ### Remove unwanted files from the docs
 %{__rm} -f doc/Makefile
 ### Clear executable stack flag bit (should not be needed)
@@ -88,6 +86,9 @@ cd -
 %exclude %{_libdir}/libxvidcore.a
 
 %changelog
+* Tue Feb 23 2016 Moriyoshi Koizumi <mozo@mozo.jp> - 1.3.4-1
+- Updated to release 1.3.4.
+
 * Tue Jul 21 2009 Dag Wieers <dag@wieers.com> - 1.2.2-1
 - Updated to release 1.2.2.
 
