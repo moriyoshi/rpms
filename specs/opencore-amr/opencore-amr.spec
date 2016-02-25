@@ -3,7 +3,7 @@
 
 Summary: Adaptive Multi-Rate Floating-point (AMR) Speech Codec
 Name: opencore-amr
-Version: 0.1.2
+Version: 0.1.3
 Release: 1%{?dist}
 License: Apache License V2.0
 Group: System Environment/Libraries
@@ -67,6 +67,9 @@ you will need to install %{name}-devel.
 %exclude %{_libdir}/libopencore-amrwb.la
 
 %changelog
+* Tue Feb 23 2016 Moriyoshi Koizumi <mozo@mozo.jp> - 0.1.3-1
+- Updated to release 0.1.3.
+
 * Sun Jun 13 2010 Dag Wieers <dag@wieers.com> - 0.1.2-1
 - Updated to release 0.1.2.
 
