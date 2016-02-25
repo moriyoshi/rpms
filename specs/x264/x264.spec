@@ -9,7 +9,7 @@
 %{?el3:%define _without_glibc232 1}
 %{?el3:%define _without_modxorg 1}
 
-%define date 20101111
+%define date 20160221
 
 Summary: Library for encoding and decoding H264/AVC video streams
 Name: x264
@@ -63,6 +63,7 @@ H264/AVC video streams using the x264 library.
     --enable-debug \
     --enable-pic \
     --enable-pthread \
+    --enable-static \
     --enable-shared \
 %{?_with_visualize:--enable-visualize} \
     --extra-cflags="%{optflags}"
@@ -88,11 +89,15 @@ H264/AVC video streams using the x264 library.
 %defattr(-, root, root, 0755)
 %doc doc/*.txt
 %{_includedir}/x264.h
+%{_includedir}/x264_config.h
 %{_libdir}/pkgconfig/x264.pc
 %{_libdir}/libx264.a
 %{_libdir}/libx264.so
 
 %changelog
+* Tue Feb 23 2016 Moriyoshi Koizumi <mozo@mozo.jp> - 0.0.0-0.4.20160221
+- Updated to git release 20160221 (soname .148).
+
 * Mon Nov 15 2010 Dag Wieers <dag@wieers.com> - 0.0.0-0.4.20101111
 - Updated to git release 20101111 (soname .107).
 
