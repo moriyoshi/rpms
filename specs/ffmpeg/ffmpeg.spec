@@ -3,8 +3,6 @@
 
 ### No package yet
 %define _without_nut 1
-%define _without_openjpeg 1
-%define _without_vpx 1
 
 ### Use native vorbis
 %define _without_vorbis 1
@@ -29,7 +27,6 @@
 %{?el4:%define _without_vdpau 1}
 
 %{?el3:%define _without_dc1394 1}
-%{?el3:%define _without_dirac 1}
 %{?el3:%define _without_rtmp 1}
 %{?el3:%define _without_schroedinger 1}
 %{?el3:%define _without_speex 1}
@@ -40,7 +37,7 @@
 
 Summary: Utilities and libraries to record, convert and stream audio and video
 Name: ffmpeg
-Version: 0.6.5
+Version: 3.0
 Release: 1%{?dist}
 License: GPL
 Group: Applications/Multimedia
@@ -53,11 +50,7 @@ BuildRequires: SDL-devel
 BuildRequires: freetype-devel
 BuildRequires: imlib2-devel
 BuildRequires: zlib-devel
-%{!?_without_a52dec:BuildRequires: a52dec-devel}
 %{!?_without_dc1394:BuildRequires: libdc1394-devel}
-%{!?_without_dirac:BuildRequires: dirac-devel}
-%{!?_without_faac:BuildRequires: faac-devel}
-%{!?_without_faad:BuildRequires: faad2-devel}
 %{!?_without_gsm:BuildRequires: gsm-devel}
 %{!?_without_lame:BuildRequires: lame-devel}
 %{!?_without_nut:BuildRequires: libnut-devel}
@@ -71,8 +64,9 @@ BuildRequires: zlib-devel
 %{!?_without_vorbis:BuildRequires: libogg-devel, libvorbis-devel}
 %{!?_without_vpx:BuildRequires: libvpx-devel}
 %{!?_without_x264:BuildRequires: x264-devel}
+%{!?_without_x265:BuildRequires: x265-devel}
 %{!?_without_xvid:BuildRequires: xvidcore-devel}
-%{!?_without_a52dec:Requires: a52dec}
+%{!?_without_fdk_aac:BuildRequires: fdk-aac-devel}
 
 %description
 FFmpeg is a very fast video and audio converter. It can also grab from a
@@ -84,18 +78,14 @@ from any sample rate to any other, and resize video on the fly with a high
 quality polyphase filter.
 
 Available rpmbuild rebuild options :
---without : lame vorbis theora faad faac gsm xvid x264 a52dec altivec
+--without : lame vorbis theora faad faac gsm xvid x264 altivec
 
 %package devel
 Summary: Header files and static library for the ffmpeg codec library
 Group: Development/Libraries
 Requires: %{name} = %{version}
 Requires: imlib2-devel, SDL-devel, freetype-devel, zlib-devel, pkgconfig
-%{!?_without_a52dec:Requires: a52dec-devel}
 %{!?_without_dc1394:Requires: libdc1394-devel}
-%{!?_without_dirac:Requires: dirac-devel}
-%{!?_without_faac:Requires: faac-devel}
-%{!?_without_faad:Requires: faad2-devel}
 %{!?_without_gsm:Requires: gsm-devel}
 %{!?_without_lame:Requires: lame-devel}
 %{!?_without_opencore_amr:Requires: opencore-amr-devel}
@@ -106,7 +96,9 @@ Requires: imlib2-devel, SDL-devel, freetype-devel, zlib-devel, pkgconfig
 %{!?_without_vorbis:Requires: libogg-devel, libvorbis-devel}
 %{!?_without_vpx:Requires: libvpx-devel}
 %{!?_without_x264:Requires: x264-devel}
+%{!?_without_x265:Requires: x265-devel}
 %{!?_without_xvid:Requires: xvidcore-devel}
+%{!?_without_fdk_aac:Requires: fdk-aac-devel}
 
 %description devel
 FFmpeg is a very fast video and audio converter. It can also grab from a
@@ -159,12 +151,9 @@ export CFLAGS="%{optflags}"
 %ifarch x86_64
     --extra-cflags="%{optflags} -fPIC" \
 %endif
+    %{!?_without_fdk_aac:--ld=g++} \
     --enable-avfilter \
-    --enable-avfilter-lavf \
 %{!?_without_dc1394:--enable-libdc1394} \
-%{!?_without_dirac:--enable-libdirac} \
-%{!?_without_faac:--enable-libfaac} \
-%{!?_without_faad:--enable-libfaad --enable-libfaadbin} \
 %{!?_without_gsm:--enable-libgsm} \
 %{!?_without_lame:--enable-libmp3lame} \
 %{!?_without_nut:--enable-libnut} \
@@ -176,6 +165,8 @@ export CFLAGS="%{optflags}"
 %{!?_without_vorbis: --enable-libvorbis} \
 %{!?_without_vpx: --enable-libvpx} \
 %{!?_without_x264:--enable-libx264} \
+%{!?_without_x265:--enable-libx265} \
+%{!?_without_fdk_aac:--enable-libfdk-aac} \
 %{!?_without_xvid:--enable-libxvid} \
     --enable-gpl \
     --enable-nonfree \
@@ -217,11 +208,32 @@ chcon -t textrel_shlib_t %{_libdir}/libav{codec,device,format,util}.so.*.*.* &>/
 
 %files
 %defattr(-, root, root, 0755)
-%doc Changelog COPYING* CREDITS INSTALL MAINTAINERS README
-%doc %{_mandir}/man1/ffprobe.1*
+%doc Changelog COPYING* CREDITS INSTALL.md MAINTAINERS LICENSE.md README.md
 %doc %{_mandir}/man1/ffmpeg.1*
+%doc %{_mandir}/man1/ffmpeg-all.1*
+%doc %{_mandir}/man1/ffmpeg-bitstream-filters.1*
+%doc %{_mandir}/man1/ffmpeg-codecs.1*
+%doc %{_mandir}/man1/ffmpeg-devices.1*
+%doc %{_mandir}/man1/ffmpeg-filters.1*
+%doc %{_mandir}/man1/ffmpeg-formats.1*
+%doc %{_mandir}/man1/ffmpeg-protocols.1*
+%doc %{_mandir}/man1/ffmpeg-resampler.1*
+%doc %{_mandir}/man1/ffmpeg-scaler.1*
+%doc %{_mandir}/man1/ffmpeg-utils.1*
 %doc %{_mandir}/man1/ffplay.1*
+%doc %{_mandir}/man1/ffplay-all.1*
+%doc %{_mandir}/man1/ffprobe.1*
+%doc %{_mandir}/man1/ffprobe-all.1*
 %doc %{_mandir}/man1/ffserver.1*
+%doc %{_mandir}/man1/ffserver-all.1*
+%doc %{_mandir}/man3/libavcodec.3*
+%doc %{_mandir}/man3/libavdevice.3*
+%doc %{_mandir}/man3/libavfilter.3*
+%doc %{_mandir}/man3/libavformat.3*
+%doc %{_mandir}/man3/libavutil.3*
+%doc %{_mandir}/man3/libswresample.3*
+%doc %{_mandir}/man3/libswscale.3*
+%doc %{_docdir}/ffmpeg/*.html
 %{_bindir}/ffprobe
 %{_bindir}/ffmpeg
 %{_bindir}/ffplay
@@ -233,6 +245,7 @@ chcon -t textrel_shlib_t %{_libdir}/libav{codec,device,format,util}.so.*.*.* &>/
 %{_libdir}/libavformat.so.*
 %{_libdir}/libavutil.so.*
 %{_libdir}/libswscale.so.*
+%{_libdir}/libswresample.so.*
 #%{_libdir}/vhook/
 
 %files devel
@@ -244,24 +257,28 @@ chcon -t textrel_shlib_t %{_libdir}/libav{codec,device,format,util}.so.*.*.* &>/
 %{_includedir}/libavformat/
 %{_includedir}/libavutil/
 %{_includedir}/libswscale/
+%{_includedir}/libswresample/
 %{_libdir}/libavcodec.a
 %{_libdir}/libavdevice.a
 %{_libdir}/libavfilter.a
 %{_libdir}/libavformat.a
 %{_libdir}/libavutil.a
 %{_libdir}/libswscale.a
+%{_libdir}/libswresample.a
 %{_libdir}/libavcodec.so
 %{_libdir}/libavdevice.so
 %{_libdir}/libavfilter.so
 %{_libdir}/libavformat.so
 %{_libdir}/libavutil.so
 %{_libdir}/libswscale.so
+%{_libdir}/libswresample.so
 %{_libdir}/pkgconfig/libavcodec.pc
 %{_libdir}/pkgconfig/libavdevice.pc
 %{_libdir}/pkgconfig/libavfilter.pc
 %{_libdir}/pkgconfig/libavformat.pc
 %{_libdir}/pkgconfig/libavutil.pc
 %{_libdir}/pkgconfig/libswscale.pc
+%{_libdir}/pkgconfig/libswresample.pc
 
 %files libpostproc
 %defattr(-, root, root, 0755)
@@ -272,6 +289,9 @@ chcon -t textrel_shlib_t %{_libdir}/libav{codec,device,format,util}.so.*.*.* &>/
 %{_libdir}/pkgconfig/libpostproc.pc
 
 %changelog
+* Tue Feb 23 2016 Moriyoshi Koizumi <mozo@mozo.jp> - 3.0-1
+- Updated to release 3.0.
+
 * Sun Jan 29 2012 Dag Wieers <dag@wieers.com> - 0.6.5-1
 - Updated to release 0.6.5.
 
