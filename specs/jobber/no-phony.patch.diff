@@ -1,0 +1,11 @@
+diff -ur jobber-1.0.3~/Makefile jobber-1.0.3/Makefile
+--- jobber-1.0.3~/Makefile	2016-03-08 10:33:24.000000000 -0500
++++ jobber-1.0.3/Makefile	2016-03-08 10:33:57.000000000 -0500
+@@ -42,7 +42,6 @@
+ .PHONY : install
+ install : build install-bin install-centos
+ 
+-.PHONY : version.go
+ version.go : update-version.sh version.go.in
+ 	bash update-version.sh
+ 

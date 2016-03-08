@@ -1,0 +1,62 @@
+Only in jobber-1.0.3: destdir-is-actually-prefix.patch.diff
+diff -ur jobber-1.0.3~/Makefile jobber-1.0.3/Makefile
+--- jobber-1.0.3~/Makefile	2016-03-08 12:55:50.000000000 -0500
++++ jobber-1.0.3/Makefile	2016-03-08 13:00:10.000000000 -0500
+@@ -1,6 +1,7 @@
+ GOPATH ?= ${HOME}/go_workspace
+ 
+-DESTDIR = /usr/local
++DESTDIR =
++PREFIX = /usr/local
+ CLIENT = jobber
+ DAEMON = jobberd
+ CLIENT_USER = jobber_client
+@@ -29,13 +30,13 @@
+ .PHONY : install-bin
+ install-bin : build \
+               test \
+-              ${DESTDIR}/bin/${CLIENT} \
+-              ${DESTDIR}/sbin/${DAEMON}
++              ${DESTDIR}${PREFIX}/bin/${CLIENT} \
++              ${DESTDIR}${PREFIX}/sbin/${DAEMON}
+ 
+ .PHONY : install-centos
+ install-centos : build \
+                  test \
+-                 /etc/init.d/jobber \
++                 ${DESTDIR}/etc/init.d/jobber \
+                  se_policy/.installed
+ 
+ .PHONY : install
+@@ -44,16 +45,16 @@
+ version.go : update-version.sh version.go.in
+ 	bash update-version.sh
+ 
+-${DESTDIR}/bin/${CLIENT} : ${GOPATH}/bin/${CLIENT}
+-	install -d "${DESTDIR}/bin"
++${DESTDIR}${PREFIX}/bin/${CLIENT} : ${GOPATH}/bin/${CLIENT}
++	install -d "${DESTDIR}${PREFIX}/bin"
+ 	install -T -m 0755 -p "${GOPATH}/bin/${CLIENT}" "$@"
+ 
+-${DESTDIR}/sbin/${DAEMON} : ${GOPATH}/bin/${DAEMON}
+-	install -d "${DESTDIR}/sbin"
++${DESTDIR}${PREFIX}/sbin/${DAEMON} : ${GOPATH}/bin/${DAEMON}
++	install -d "${DESTDIR}${PREFIX}/sbin"
+ 	install -T -m 0755 -p "${GOPATH}/bin/${DAEMON}" "$@"
+ 
+-/etc/init.d/jobber : jobber_init
+- 	install -T -m 0755 "$<" "$@"
++${DESTDIR}/etc/init.d/jobber : jobber_init
++	install -T -m 0755 "$<" "$@"
+ 
+ se_policy/jobber.pp : ${SE_FILES}
+ 	${MAKE} -C se_policy
+@@ -63,7 +64,7 @@
+ 
+ .PHONY : uninstall-bin
+ uninstall-bin :
+-	rm -f "${DESTDIR}/bin/${CLIENT}" "${DESTDIR}/sbin/${DAEMON}"
++	rm -f "${DESTDIR}${PREFIX}/bin/${CLIENT}" "${DESTDIR}${PREFIX}/sbin/${DAEMON}"
+ 
+ .PHONY : uninstall-centos
+ uninstall-centos :
